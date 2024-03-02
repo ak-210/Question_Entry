@@ -4,22 +4,25 @@ import csv
 import os
 import shutil
 
-def saveImg(num):
-    user = user_entry.get()
-
+def saveImg(user, num):
     f = filedialog.askopenfilename()
     filename = os.path.basename(f)
+
     path = os.path.dirname(os.path.realpath(__file__))
     path = os.path.join(path, 'figures')
+
     shutil.copy(f, path)
     os.rename(f'figures/{filename}', f'figures/technical_question_{user}_{num}.png')
-    return f'technical_question_{user}_{num}.png'
+    return f'tq_{user}_{num}.png'
 
 def enter_data():
-    num = 1
-    with open('info/tech_no.txt', 'r') as t:
-        j = t.read()
-        if j != '': num = int(j)
+    user = user_entry.get()
+    try:
+        with open(f'info/tq_{user}.txt', 'r') as t:
+            j = t.read()
+            if j != '': num = int(j)
+    except:
+        num = 1
 
     title = title_entry.get()
     question = que_entry.get("1.0", "end")
@@ -28,7 +31,7 @@ def enter_data():
     difficulty = diff_entry.get()
     tags = tag_entry.get()
     topic = topic_entry.get()
-    figure = saveImg(num) if fig_avl.get() else ''
+    figure = saveImg(user, num) if fig_avl.get() else ''
     link = link_entry.get()
 
     if title and question and constraints and company and difficulty and tags and topic:
@@ -38,10 +41,22 @@ def enter_data():
             w.writerow([num, title, question, figure, constraints, link, company, difficulty, tags])
             num += 1
 
-            with open('info/tech_no.txt', 'w') as t:
+            clearall()
+
+            with open(f'info/tq_{user}.txt', 'w') as t:
                 t.write(str(num))
     else:
         tkinter.messagebox.showerror("Error", "Please enter all the fields.")
+
+def clearall():
+    title_entry.delete(0, 'end')
+    que_entry.delete("1.0", "end")
+    con_entry.delete("1.0", "end")
+    comp_entry.delete(0, 'end')
+    topic_entry.delete(0, 'end')
+    link_entry.delete(0, 'end')
+    fig_avl = False
+
 
 window = tkinter.Tk()
 
